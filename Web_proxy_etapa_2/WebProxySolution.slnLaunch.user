@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "SmartProxy\\SmartProxy.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "DataWarehouse1\\DataWarehouse1.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "DataWarehouse2\\DataWarehouse2.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
