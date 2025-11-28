@@ -1,29 +1,25 @@
-# ----------------------------
-# 1. Build stage
-# ----------------------------
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY SmartProxy/SmartProxy.csproj SmartProxy/
-COPY DataWarehouse1/DataWarehouse1.csproj DataWarehouse1/
-COPY DataWarehouse2/DataWarehouse2.csproj DataWarehouse2/
-COPY ClientTester/ClientTester.csproj ClientTester/
+# Copy complete solution
+COPY Web_proxy_etapa_2/WebProxySolution.sln .
+COPY Web_proxy_etapa_2/SmartProxy/ SmartProxy/
+COPY Web_proxy_etapa_2/DataWarehouse1/ DataWarehouse1/
+COPY Web_proxy_etapa_2/DataWarehouse2/ DataWarehouse2/
+COPY Web_proxy_etapa_2/ClientTester/ ClientTester/
 
-RUN dotnet restore SmartProxy/SmartProxy.csproj
+# Restore NuGet dependencies
+RUN dotnet restore WebProxySolution.sln
 
-COPY . .
+# Build project
+RUN dotnet publish SmartProxy/SmartProxy.csproj -c Release -o /app
 
-RUN dotnet publish SmartProxy/SmartProxy.csproj -c Release -o /app/publish
-
-# ----------------------------
-# 2. Runtime stage
-# ----------------------------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+COPY --from=build /app .
 
-COPY --from=build /app/publish .
-
-ENV ASPNETCORE_URLS=http://+:10000
-EXPOSE 10000
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "SmartProxy.dll"]
