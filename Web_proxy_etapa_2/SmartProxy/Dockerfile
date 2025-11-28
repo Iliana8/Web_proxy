@@ -1,21 +1,17 @@
-# STAGE 1 — Build
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiem doar proiectul SmartProxy
-COPY SmartProxy.csproj ./
-RUN dotnet restore SmartProxy.csproj
+COPY SmartProxy.csproj .
+RUN dotnet restore
 
-# Copiem restul fișierelor
-COPY . ./
+COPY . .
+RUN dotnet publish -c Release -o /app
 
-RUN dotnet publish SmartProxy.csproj -c Release -o /app
-
-# STAGE 2 — Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app .
 
 EXPOSE 8080
-
 ENTRYPOINT ["dotnet", "SmartProxy.dll"]
